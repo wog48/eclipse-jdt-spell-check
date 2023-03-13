@@ -1,10 +1,19 @@
 package camelcase.jdt.spelling;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import camelcase.jdt.spelling.checker.SpellChecker;
@@ -18,6 +27,8 @@ import camelcase.jdt.spelling.marker.MarkerFactory;
 
 public class SpellingPlugin extends AbstractUIPlugin {
   public static final String PLUGIN_ID = "camelcase.jdt.spelling";
+  public static final String IMAGE_ID = "correction_rename";
+  private static final String JDT_PLUGIN = "org.eclipse.jdt.ui";
   private static SpellingPlugin instance = new SpellingPlugin();
 
   private IWorkbench workbench;
@@ -38,6 +49,16 @@ public class SpellingPlugin extends AbstractUIPlugin {
 
   public void initialise(final IWorkbench workbench) {
     this.workbench = workbench;
+    final Bundle bundle = Platform.getBundle(PLUGIN_ID);
+    final IPath path = new Path("icons/correction_rename.png");
+    final URL url = FileLocator.find(bundle, path, null);
+    final ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+    getImageRegistry().put(IMAGE_ID, desc);
+    getImageRegistry().get(IMAGE_ID);
+
+    final ISharedImages images = workbench.getSharedImages();
+    final Image image = images.getImage("correction_rename");
+
     debug("Workbench set: " + workbench.toString());
     updateStatus();
   }

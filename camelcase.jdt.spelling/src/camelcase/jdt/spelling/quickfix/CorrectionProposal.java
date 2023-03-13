@@ -74,7 +74,7 @@ public class CorrectionProposal implements IJavaCompletionProposal {
 
   @Override
   public Image getImage() {
-    return null; // Images.getImage(Images.CORRECT);
+    return SpellingPlugin.getInstance().getImageRegistry().get(SpellingPlugin.IMAGE_ID);
   }
 
   @Override
