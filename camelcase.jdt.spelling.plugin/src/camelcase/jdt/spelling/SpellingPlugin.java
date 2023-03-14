@@ -26,7 +26,7 @@ import camelcase.jdt.spelling.listener.WorkbenchTrackerFactory;
 import camelcase.jdt.spelling.marker.MarkerFactory;
 
 public class SpellingPlugin extends AbstractUIPlugin {
-  public static final String PLUGIN_ID = "camelcase.jdt.spelling";
+  public static final String PLUGIN_ID = "camelcase.jdt.spelling.plugin";
   public static final String IMAGE_ID = "correction_rename";
   private static final String JDT_PLUGIN = "org.eclipse.jdt.ui";
   private static SpellingPlugin instance = new SpellingPlugin();

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Spelling
-Bundle-SymbolicName: camelcase.jdt.spelling;singleton:=true
+Bundle-SymbolicName: camelcase.jdt.spelling.plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: camelcase.jdt.spelling
 Bundle-RequiredExecutionEnvironment: JavaSE-11,
