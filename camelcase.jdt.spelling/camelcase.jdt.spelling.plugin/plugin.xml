@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.jdt.ui.quickFixProcessors">
+      <quickFixProcessor
+            class="camelcase.jdt.spelling.quickfix.SpellingFixProcessor"
+            id="camelcase.jdt.spelling.quickFixProcessor"
+            name="%quickFixProcessor.name">
+      </quickFixProcessor>
+   </extension>
+   <extension
+         id="camelcase.jdt.spelling.marker"
+         name="%extension.name"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker"/>
+      <super type="org.eclipse.core.resources.textmarker"/>
+      <persistent value="false"/>    
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            markerType="camelcase.jdt.spelling.marker"
+            name="camelcase.jdt.spelling">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="camelcase.jdt.spelling"
+            colorPreferenceKey="camelcase.jdt.spelling.marker.color"
+            colorPreferenceValue="124,84,224"
+            contributesToHeader="false"
+            highlightPreferenceKey="camelcase.jdt.spelling.marker.highlight"
+            highlightPreferenceValue="false"
+            icon="icons/spellcheck.gif"
+            includeOnPreferencePage="true"
+            label="%specification.label"
+            overviewRulerPreferenceKey="camelcase.jdt.spelling.marker.overview"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="0"
+            quickFixIcon="icons/spellcheck.gif"
+            showInNextPrevDropdownToolbarAction="true"
+            textPreferenceKey="camelcase.jdt.spelling.marker.text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="camelcase.jdt.spelling.marker.style"
+            textStylePreferenceValue="PROBLEM_UNDERLINE"
+            verticalRulerPreferenceKey="camelcase.jdt.spelling.marker.ruler"
+            verticalRulerPreferenceValue="true">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="camelcase.jdt.spelling.Startup">
+      </startup>
+   </extension>
+
+</plugin>

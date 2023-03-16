@@ -2,11 +2,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>camelcase.jdt.spelling</groupId>
 	<artifactId>camelcase.jdt.spelling</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho.version>2.7.4</tycho.version>
+		<tycho.version>3.0.3</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-repo.url>https://download.eclipse.org/releases/latest</eclipse-repo.url>
 	</properties>
@@ -58,6 +58,7 @@
 				<configuration>
 					<!-- Optional set the Java version you are using-->
 					<!--   <executionEnvironment>JavaSE-17</executionEnvironment>-->
+					<pomDependencies>consider</pomDependencies>
 					<environments>
 						<environment>
 							<os>linux</os>
@@ -82,5 +83,6 @@
 	<modules>
 		<!--TODO ADD YOUR MODULES HERE-->
 		<module>camelcase.jdt.spelling.plugin</module>
+		<module>camelcase.jdt.spelling.test</module>
 	</modules>
 </project>
