@@ -9,15 +9,15 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 
 import camelcase.jdt.spelling.SpellingPlugin;
-import camelcase.jdt.spelling.checker.SpellChecker;
+import camelcase.jdt.spelling.checker.ISpellChecker;
 import camelcase.jdt.spelling.marker.MarkerFactory;
 
 public class ChangeListener implements IElementChangedListener {
-  private final SpellChecker spellChecker;
+  private final ISpellChecker spellChecker;
   private final IWorkbenchTracker workbenchTracker;
   private final MarkerFactory markerFactory;
 
-  public ChangeListener(final SpellChecker spellChecker, final IWorkbenchTracker workbenchTracker,
+  public ChangeListener(final ISpellChecker spellChecker, final IWorkbenchTracker workbenchTracker,
       final MarkerFactory markerFactory) {
     this.spellChecker = spellChecker;
     this.workbenchTracker = workbenchTracker;
@@ -38,7 +38,7 @@ public class ChangeListener implements IElementChangedListener {
           + "|"
           + Integer.toBinaryString(delta.getFlags()));
       if (isCurrent(element))
-        markerFactory.process(element, spellChecker.checkElement((ICompilationUnit) element));
+        markerFactory.process(element.getResource(), spellChecker.checkElement((ICompilationUnit) element));
     }
   }
 

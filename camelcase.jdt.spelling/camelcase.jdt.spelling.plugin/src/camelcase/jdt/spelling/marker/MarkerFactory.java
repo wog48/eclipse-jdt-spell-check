@@ -7,11 +7,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 
 import camelcase.jdt.spelling.SpellingPlugin;
 import camelcase.jdt.spelling.checker.SpellingEvent;
@@ -22,8 +27,7 @@ public class MarkerFactory {
 
   private final Set<SpellingEvent> marker = new HashSet<>();
 
-  public synchronized void process(final IJavaElement element, final List<SpellingEvent> toBeMarked) {
-    final IResource resource = element.getResource();
+  public synchronized void process(final IResource resource, final List<SpellingEvent> toBeMarked) {
 
     if (makerChanged(toBeMarked)) {
       clear(resource);
@@ -99,6 +103,21 @@ public class MarkerFactory {
       marker.clear();
     } catch (final CoreException e) {
       SpellingPlugin.getInstance().getLog().error("", e);
+    }
+  }
+
+  public void clear(final IWorkbench workbench) {
+    final IWorkbenchPage[] pages =
+        workbench
+            .getActiveWorkbenchWindow()
+            .getPages();
+    for (final IWorkbenchPage page : pages) {
+      final IEditorReference[] editors = page.getEditorReferences();
+      for (final IEditorReference editor : editors)
+        Optional.ofNullable(editor.getEditor(false))
+            .map(IEditorPart::getEditorInput)
+            .map(i -> i.getAdapter(IFile.class))
+            .ifPresent(r -> clear(r));
     }
   }
 }

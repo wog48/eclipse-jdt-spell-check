@@ -6,14 +6,14 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 
 import camelcase.jdt.spelling.SpellingPlugin;
-import camelcase.jdt.spelling.checker.SpellChecker;
+import camelcase.jdt.spelling.checker.ISpellChecker;
 import camelcase.jdt.spelling.marker.MarkerFactory;
 
 class WindowListener implements IWindowListener, IWorkbenchTracker {
 
   private final PageListener pageListener;
 
-  WindowListener(final SpellChecker checker, final MarkerFactory markerFactory) {
+  WindowListener(final ISpellChecker checker, final MarkerFactory markerFactory) {
     pageListener = new PageListener(checker, markerFactory);
   }
 

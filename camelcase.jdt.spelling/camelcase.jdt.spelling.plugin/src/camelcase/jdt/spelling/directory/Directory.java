@@ -1,6 +1,7 @@
 package camelcase.jdt.spelling.directory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class Directory implements IDirectory {
@@ -49,10 +50,13 @@ class Directory implements IDirectory {
 
     short level = 0;
 
-    final List<TreeNode> rootNode = new ArrayList<TreeNode>();
-    rootNode.add(root.getSuccessor(chars[level]));
-    stack[level] = rootNode;
     distance[level][DISTANCE_COLUMN] = distance[level][RELATIVE_COLUMN] = 0;
+    final List<TreeNode> rootNode = new ArrayList<TreeNode>();
+
+    final TreeNode node = root.getSuccessor(chars[level]);
+    if (node == null) return Collections.emptyList();
+    stack[level] = rootNode;
+    rootNode.add(node);
 
     while (stack[0] != null)
       if (!stack[level].isEmpty()) {

@@ -2,6 +2,8 @@ package camelcase.jdt.spelling;
 
 import java.net.URL;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -9,35 +11,33 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import camelcase.jdt.spelling.checker.SpellChecker;
+import camelcase.jdt.spelling.checker.ISpellChecker;
 import camelcase.jdt.spelling.checker.SpellCheckerFactory;
 import camelcase.jdt.spelling.directory.DictionaryFactory;
-import camelcase.jdt.spelling.directory.IDirectory;
 import camelcase.jdt.spelling.listener.ChangeListener;
 import camelcase.jdt.spelling.listener.IWorkbenchTracker;
 import camelcase.jdt.spelling.listener.WorkbenchTrackerFactory;
 import camelcase.jdt.spelling.marker.MarkerFactory;
+import camelcase.jdt.spelling.quickfix.AddWordProposal;
+import camelcase.jdt.spelling.quickfix.CorrectionProposal;
 
 public class SpellingPlugin extends AbstractUIPlugin {
   public static final String PLUGIN_ID = "camelcase.jdt.spelling.plugin";
-  public static final String IMAGE_ID = "correction_rename";
-  private static final String JDT_PLUGIN = "org.eclipse.jdt.ui";
   private static SpellingPlugin instance = new SpellingPlugin();
 
   private IWorkbench workbench;
   private IWorkbenchTracker workbenchTracker;
   private IElementChangedListener changeListener;
   private SpellCheckerFactory checkerFactory;
-  private SpellChecker checker;
-  private IDirectory directory;
+  private ISpellChecker checker;
   private MarkerFactory markerFactory;
+  private DictionaryFactory dictionaryFactory;
 
   public static SpellingPlugin getInstance() {
     return instance;
@@ -50,17 +50,19 @@ public class SpellingPlugin extends AbstractUIPlugin {
   public void initialize(final IWorkbench workbench) {
     this.workbench = workbench;
     final Bundle bundle = Platform.getBundle(PLUGIN_ID);
-    final IPath path = new Path("icons/correction_rename.png");
-    final URL url = FileLocator.find(bundle, path, null);
-    final ImageDescriptor desc = ImageDescriptor.createFromURL(url);
-    getImageRegistry().put(IMAGE_ID, desc);
-    getImageRegistry().get(IMAGE_ID);
-
-    final ISharedImages images = workbench.getSharedImages();
-    final Image image = images.getImage("correction_rename");
+    addIcon(bundle, CorrectionProposal.IMAGE_ID);
+    addIcon(bundle, AddWordProposal.IMAGE_ID);
 
     debug("Workbench set: " + workbench.toString());
     updateStatus();
+  }
+
+  private void addIcon(final Bundle bundle, final String imageId) {
+    final String pathString = "icons/" + imageId;
+    final IPath path = new Path(pathString);
+    final URL url = FileLocator.find(bundle, path, null);
+    final ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+    getImageRegistry().put(imageId, desc);
   }
 
   private void updateStatus() {
@@ -79,15 +81,15 @@ public class SpellingPlugin extends AbstractUIPlugin {
     enable();
   }
 
-  public SpellChecker getSpellChecker() {
+  public ISpellChecker getSpellChecker() {
     return checker;
   }
 
-  private synchronized void enable() {
+  public synchronized void enable() {
     if (workbench != null) {
-      directory = new DictionaryFactory().getDirectory();
+      dictionaryFactory = new DictionaryFactory();
       markerFactory = new MarkerFactory();
-      checkerFactory = new SpellCheckerFactory(directory);
+      checkerFactory = new SpellCheckerFactory(dictionaryFactory);
       checker = checkerFactory.getSpellChecker();
       workbenchTracker = new WorkbenchTrackerFactory().getWorkbenchTracker(checker, markerFactory);
       workbenchTracker.track(workbench);
@@ -96,11 +98,12 @@ public class SpellingPlugin extends AbstractUIPlugin {
     }
   }
 
-  private synchronized void disable() {
+  public synchronized void disable() {
     if (workbench != null) {
       workbenchTracker.untrack(workbench);
       JavaCore.removeElementChangedListener(changeListener);
       checkerFactory = null;
+      markerFactory.clear(workbench);
     }
   }
 
@@ -122,8 +125,8 @@ public class SpellingPlugin extends AbstractUIPlugin {
 
   }
 
-  public IDirectory getDirectory() {
-    return directory;
+  public DictionaryFactory getDictionaryFactory() {
+    return dictionaryFactory;
   }
 
   public static void error(final Exception e) {
@@ -131,6 +134,13 @@ public class SpellingPlugin extends AbstractUIPlugin {
         .getLog()
         .error("An error occured ", e);
 
+  }
+
+  public void checkCurrent() {
+    final IEditorPart editor = workbench.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+    final IResource r = editor.getEditorInput().getAdapter(IFile.class);
+    markerFactory.clear(r);
+    checker.checkResource(r);
   }
 
 }

@@ -3,19 +3,19 @@ package camelcase.jdt.spelling.listener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 
 import camelcase.jdt.spelling.SpellingPlugin;
-import camelcase.jdt.spelling.checker.SpellChecker;
+import camelcase.jdt.spelling.checker.ISpellChecker;
+import camelcase.jdt.spelling.checker.SpellingEvent;
 import camelcase.jdt.spelling.marker.MarkerFactory;
 
 @SuppressWarnings("restriction")
@@ -24,11 +24,11 @@ class PartListener implements IPartListener {
   private static final Collection<String> JAVA_EXTENSIONS =
       new HashSet<String>(Arrays.asList(JavaCore.getJavaLikeExtensions()));
 
-  private final SpellChecker spellChecker;
+  private final ISpellChecker spellChecker;
   private IResource currentResource;
   private final MarkerFactory markerFactory;
 
-  PartListener(final SpellChecker checker, final MarkerFactory markerFactory) {
+  PartListener(final ISpellChecker checker, final MarkerFactory markerFactory) {
     super();
     this.spellChecker = checker;
     this.markerFactory = markerFactory;
@@ -101,10 +101,8 @@ class PartListener implements IPartListener {
 
   private void checkResource(final IResource resource) {
     if (shouldProcess(resource)) {
-      final IJavaElement element = JavaCore.create(resource);
-      final ICompilationUnit cu = (ICompilationUnit) element.getAncestor(IJavaElement.COMPILATION_UNIT);
-      if (cu != null)
-        markerFactory.process(cu, spellChecker.checkElement(cu));
+      final List<SpellingEvent> spellEvents = spellChecker.checkResource(resource);
+      markerFactory.process(resource, spellEvents);
     }
   }
 

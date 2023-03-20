@@ -25,6 +25,7 @@ import camelcase.jdt.spelling.parser.Token;
 @SuppressWarnings("restriction")
 public class CorrectionProposal implements IJavaCompletionProposal {
 
+  public static final String IMAGE_ID = "correction_rename.png";
   private static final int RELEVANCE = 8;
 
   private final Token proposal;
@@ -67,7 +68,7 @@ public class CorrectionProposal implements IJavaCompletionProposal {
 
   @Override
   public Image getImage() {
-    return SpellingPlugin.getInstance().getImageRegistry().get(SpellingPlugin.IMAGE_ID);
+    return SpellingPlugin.getInstance().getImageRegistry().get(IMAGE_ID);
   }
 
   @Override

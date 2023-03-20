@@ -30,7 +30,7 @@
       <specification
             annotationType="camelcase.jdt.spelling"
             colorPreferenceKey="camelcase.jdt.spelling.marker.color"
-            colorPreferenceValue="124,84,224"
+            colorPreferenceValue="7,62,173"
             contributesToHeader="false"
             highlightPreferenceKey="camelcase.jdt.spelling.marker.highlight"
             highlightPreferenceValue="false"
@@ -55,6 +55,20 @@
       <startup
             class="camelcase.jdt.spelling.Startup">
       </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="camelcase.jdt.spelling.preferences.PreferencePage"
+            id="camelcase.jdt.spelling.preferences.PreferencePage"
+            name="Spelling Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="camelcase.jdt.spelling.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

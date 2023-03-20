@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -17,10 +18,10 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 class SpellCheckVisitor extends ASTVisitor {
 
-  private final SpellChecker checker;
+  private final ISpellChecker checker;
   private final List<SpellingEvent> spellEvents;
 
-  public SpellCheckVisitor(final SpellChecker checker) {
+  public SpellCheckVisitor(final ISpellChecker checker) {
     this.checker = checker;
     this.spellEvents = new ArrayList<>();
   }
@@ -60,18 +61,22 @@ class SpellCheckVisitor extends ASTVisitor {
   }
 
   private void checkNode(final TypeDeclaration node) {
-    final IJavaElement element = node.resolveBinding().getJavaElement();
-    spellEvents.addAll(checker.checkElement(element));
+    triggerSpellCheck(node.resolveBinding());
   }
 
   private void checkNode(final MethodDeclaration node) {
-    final IJavaElement element = node.resolveBinding().getJavaElement();
-    spellEvents.addAll(checker.checkElement(element));
+    triggerSpellCheck(node.resolveBinding());
   }
 
   private void checkNode(final VariableDeclaration declaration) {
-    final IJavaElement element = declaration.resolveBinding().getJavaElement();
-    spellEvents.addAll(checker.checkElement(element));
+    triggerSpellCheck(declaration.resolveBinding());
+  }
+
+  private void triggerSpellCheck(final IBinding binding) {
+    if (binding != null) {
+      final IJavaElement element = binding.getJavaElement();
+      spellEvents.addAll(checker.checkElement(element));
+    }
   }
 
   private void checkNode(final VariableDeclarationExpression initializer) {

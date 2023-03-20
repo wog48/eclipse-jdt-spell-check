@@ -9,14 +9,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 
 import camelcase.jdt.spelling.SpellingPlugin;
-import camelcase.jdt.spelling.checker.SpellChecker;
+import camelcase.jdt.spelling.checker.ISpellChecker;
 import camelcase.jdt.spelling.marker.MarkerFactory;
 
 class PageListener implements IPageListener {
 
   private final PartListener partListener;
 
-  PageListener(final SpellChecker checker, final MarkerFactory markerFactory) {
+  PageListener(final ISpellChecker checker, final MarkerFactory markerFactory) {
     this.partListener = new PartListener(checker, markerFactory);
   }
 

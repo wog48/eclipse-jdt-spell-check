@@ -1,18 +1,21 @@
 package camelcase.jdt.spelling.checker;
 
+import java.util.List;
+
+import camelcase.jdt.spelling.directory.DictionaryFactory;
 import camelcase.jdt.spelling.directory.IDirectory;
 
 public class SpellCheckerFactory {
 
-  private final IDirectory directory;
+  private final List<IDirectory> directories;
 
-  public SpellCheckerFactory(final IDirectory directory) {
+  public SpellCheckerFactory(final DictionaryFactory dictionaryFactory) {
     super();
-    this.directory = directory;
+    this.directories = dictionaryFactory.getDirectories();
   }
 
-  public SpellChecker getSpellChecker() {
-    return new Checker(directory);
+  public ISpellChecker getSpellChecker() {
+    return new SpellChecker(directories);
   }
 
 }

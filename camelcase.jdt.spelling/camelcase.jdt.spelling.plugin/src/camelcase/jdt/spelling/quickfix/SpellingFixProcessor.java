@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -17,7 +18,7 @@ import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
 import camelcase.jdt.spelling.SpellingPlugin;
-import camelcase.jdt.spelling.checker.SpellChecker;
+import camelcase.jdt.spelling.checker.ISpellChecker;
 import camelcase.jdt.spelling.checker.SpellingEvent;
 import camelcase.jdt.spelling.directory.IDirectory;
 import camelcase.jdt.spelling.parser.Fragment;
@@ -43,19 +44,32 @@ public class SpellingFixProcessor implements IQuickFixProcessor {
       final SimpleName term = (SimpleName) context.getCoveringNode();
       final Token token = new Token(term.resolveBinding().getJavaElement());
       final int position = context.getSelectionOffset() - term.getStartPosition();
-      final SpellChecker checker = SpellingPlugin.getInstance().getSpellChecker();
-      final IDirectory directory = SpellingPlugin.getInstance().getDirectory();
-      if (checker != null && directory != null) {
+      final ISpellChecker checker = SpellingPlugin.getInstance().getSpellChecker();
+      final List<IDirectory> directories = SpellingPlugin.getInstance().getDictionaryFactory().getDirectories();
+
+      if (checker != null && directories != null) {
         final List<SpellingEvent> spellEvents = determineSpellEvents(token, position, checker);
-        final Map<Fragment, List<String>> r = buildReplacements(directory, spellEvents);
+        final Map<Fragment, List<String>> r = buildReplacements(directories, spellEvents);
         final List<Map<Fragment, String>> preProposals = buildPreProposal(r);
-        return asProposal(context, term, token, preProposals);
+        final List<IJavaCompletionProposal> proposals = asProposal(context, term, token, preProposals);
+        createAddWordProposal(position, spellEvents).ifPresent(proposals::add);
+        return proposals.toArray(new IJavaCompletionProposal[proposals.size()]);
       }
     }
     return null;
   }
 
-  private IJavaCompletionProposal[] asProposal(final IInvocationContext context, final SimpleName term,
+  private Optional<AddWordProposal> createAddWordProposal(final int position, final List<SpellingEvent> spellEvents) {
+
+    return spellEvents.stream()
+        .filter(f -> f.getFragment().getFragmentStart() <= position && f.getFragment().getFragmentEnd() >= position)
+        .findFirst()
+        .map(SpellingEvent::getFragment)
+        .map(Fragment::getOriginalFragment)
+        .map(AddWordProposal::new);
+  }
+
+  private List<IJavaCompletionProposal> asProposal(final IInvocationContext context, final SimpleName term,
       final Token token, final List<Map<Fragment, String>> preProposals) {
 
     final List<IJavaCompletionProposal> proposals = new ArrayList<>();
@@ -63,7 +77,7 @@ public class SpellingFixProcessor implements IQuickFixProcessor {
       final Token newToken = token.replaceFragments(replace);
       proposals.add(new CorrectionProposal((AssistContext) context, newToken));
     }
-    return proposals.toArray(new IJavaCompletionProposal[proposals.size()]);
+    return proposals;
   }
 
   private List<Map<Fragment, String>> buildPreProposal(final Map<Fragment, List<String>> r) {
@@ -86,20 +100,25 @@ public class SpellingFixProcessor implements IQuickFixProcessor {
     return preProposals;
   }
 
-  private Map<Fragment, List<String>> buildReplacements(final IDirectory directory,
+  private Map<Fragment, List<String>> buildReplacements(final List<IDirectory> directories,
       final List<SpellingEvent> spellEvents) {
 
     final Map<Fragment, List<String>> replacements = new HashMap<>();
     for (final SpellingEvent event : spellEvents) {
       final Fragment f = event.getFragment();
       final String error = f.getOriginalFragmentLower();
-      replacements.put(f, directory.getProposals(error));
+
+      replacements.put(f, directories.stream()
+          .map(d -> d.getProposals(error))
+          .flatMap(List::stream)
+          .collect(Collectors.toList()));
+
     }
     return replacements;
   }
 
   private List<SpellingEvent> determineSpellEvents(final Token token, final int pos,
-      final SpellChecker checker) {
+      final ISpellChecker checker) {
 
     final List<SpellingEvent> events = checker.checkElement(token);
 
