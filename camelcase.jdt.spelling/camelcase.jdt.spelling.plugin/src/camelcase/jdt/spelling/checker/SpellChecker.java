@@ -3,6 +3,7 @@ package camelcase.jdt.spelling.checker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -15,6 +16,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 
 import camelcase.jdt.spelling.SpellingPlugin;
 import camelcase.jdt.spelling.directory.IDirectory;
+import camelcase.jdt.spelling.parser.Fragment;
 import camelcase.jdt.spelling.parser.Token;
 
 class SpellChecker implements ISpellChecker {
@@ -42,16 +44,22 @@ class SpellChecker implements ISpellChecker {
 
   @Override
   public List<SpellingEvent> checkElement(final Token token) {
-    List<SpellingEvent> result = null;
+    List<Fragment> unknownFragments = token.getFragments();
+
+    List<SpellingEvent> result = Collections.emptyList();
     for (final IDirectory directory : directories) {
-      final List<SpellingEvent> intermediateResult = executeCheck(token, directory);
-      if (intermediateResult.isEmpty())
-        return intermediateResult;
-      if (result == null
-          || intermediateResult.size() < result.size())
-        result = intermediateResult;
+      result = executeCheck(token, unknownFragments, directory);
+      if (result.isEmpty())
+        return result;
+      unknownFragments = extractFragments(result);
     }
     return result;
+  }
+
+  private List<Fragment> extractFragments(final List<SpellingEvent> events) {
+    return events.stream()
+        .map(SpellingEvent::getFragment)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -59,12 +67,13 @@ class SpellChecker implements ISpellChecker {
     return checkElement(new Token(element));
   }
 
-  private List<SpellingEvent> executeCheck(final Token token, final IDirectory directory) {
+  private List<SpellingEvent> executeCheck(final Token token, final List<Fragment> unknownFragments,
+      final IDirectory directory) {
 
     final List<SpellingEvent> result = new ArrayList<>();
     if (IJavaElement.COMPILATION_UNIT != token.getElement().getElementType()) {
       SpellingPlugin.debug("Check element " + token.getElement());
-      token.getFragments().stream()
+      unknownFragments.stream()
           .forEach(fragment -> {
             if (!fragment.isSplitter()
                 && !directory.contains(fragment.getOriginalFragmentLower())
@@ -88,7 +97,7 @@ class SpellChecker implements ISpellChecker {
   }
 
   private List<SpellingEvent> handleParentSourceReference(final ICompilationUnit cu) {
-    SpellingPlugin.getInstance().getLog().info("Check compilation unit " + cu);
+    SpellingPlugin.debug("Check compilation unit " + cu);
     if (cu instanceof ISourceReference) {
       final SpellCheckVisitor visitor = new SpellCheckVisitor(this);
       createASTParser(cu).accept(visitor);

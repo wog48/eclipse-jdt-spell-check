@@ -45,7 +45,7 @@ public class CorrectionProposal implements IJavaCompletionProposal {
       final IWorkbenchWindow workbenchWindow = context.getEditor().getSite().getWorkbenchWindow();
 
       renameSupport.perform(workbenchWindow.getShell(), workbenchWindow);
-
+      SpellingPlugin.getInstance().checkCurrent();
     } catch (InterruptedException | InvocationTargetException | CoreException e) {
       SpellingPlugin.error(e);
     }
