@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: camelcase.jdt.spelling.plugin;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.2
 Automatic-Module-Name: camelcase.jdt.spelling
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.eclipse.jdt.ui;bundle-version="3.26.100",
@@ -20,4 +20,5 @@ Export-Package: camelcase.jdt.spelling,
  camelcase.jdt.spelling.listener,
  camelcase.jdt.spelling.marker,
  camelcase.jdt.spelling.parser,
+ camelcase.jdt.spelling.preferences,
  camelcase.jdt.spelling.quickfix

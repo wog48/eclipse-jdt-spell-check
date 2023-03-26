@@ -2,6 +2,7 @@ package camelcase.jdt.spelling.checker;
 
 import java.util.Objects;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.ISourceReference;
@@ -16,6 +17,7 @@ public class SpellingEvent {
   private final Fragment fragment;
   private final Token token;
   private final IJavaElement element;
+  private IResource resource;
 
   SpellingEvent(final Fragment fragment, final Token token) {
     this.fragment = fragment;
@@ -33,6 +35,14 @@ public class SpellingEvent {
 
   public IJavaElement getElement() {
     return element;
+  }
+
+  public IResource getResource() {
+    return resource;
+  }
+
+  public void setResource(final IResource resource) {
+    this.resource = resource;
   }
 
   public ISourceRange getSourceRange() throws JavaModelException {

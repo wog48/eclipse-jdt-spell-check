@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>camelcase.jdt.spelling</groupId>
 	<artifactId>camelcase.jdt.spelling</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.2</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -84,5 +84,7 @@
 		<!--TODO ADD YOUR MODULES HERE-->
 		<module>camelcase.jdt.spelling.plugin</module>
 		<module>camelcase.jdt.spelling.test</module>
+		<module>camelcase.jdt.spelling.feature</module>
+		<module>camelcase.jdt.spelling.update</module>
 	</modules>
 </project>

@@ -53,7 +53,7 @@ public class MarkerFactory {
   public void create(final SpellingEvent event) {
     try {
       final IJavaElement javaElement = event.getElement();
-      final IResource resource = javaElement.getResource();
+      final IResource resource = findResource(event);
       final ISourceRange sourceRange = event.getSourceRange();
 
       scheduleWorkspaceJob(resource, sourceRange.getOffset(),
@@ -64,6 +64,16 @@ public class MarkerFactory {
     } finally {
       marker.add(event);
     }
+  }
+
+  private IResource findResource(final SpellingEvent event) {
+    final IResource r = event.getElement().getResource();
+    if (r == null)
+      return event.getResource();
+//    final IResource r = event.getResource();
+//    if (r == null && event.getParent() != null)
+//      return findResource(event.getParent());
+    return r;
   }
 
   private void scheduleWorkspaceJob(final IResource resource, final int start, final int end,
@@ -80,6 +90,8 @@ public class MarkerFactory {
 
   private Optional<IMarker> create(final IResource resource, final Map<String, Object> attributes) {
     try {
+      if (resource == null)
+        SpellingPlugin.getInstance().getLog().error("Resource null");
       if (resource.exists())
         return Optional.of(resource.createMarker(SPELLING_MARKER, attributes));
     } catch (final CoreException e) {

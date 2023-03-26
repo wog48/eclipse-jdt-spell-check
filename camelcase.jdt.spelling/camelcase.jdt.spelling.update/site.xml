@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/camelcase.jdt.spelling.feature_1.0.2.jar" id="camelcase.jdt.spelling.feature" version="1.0.2"/>
+</site>

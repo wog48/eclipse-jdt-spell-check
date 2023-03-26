@@ -1,0 +1,18 @@
+= Spell check plug-in for eclipse
+
+This plug-in supports spell check for Java elements like classes, interfaces, method or local variables. 
+The check respects 
+
+Not all occurrences are marked 
+
+
+https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance[Damerau–Levenshtein Distance] 
+
+[NOTE]
+====
+An admonition block may contain complex content.
+
+====
+
+Rename
+Add to a specific directory
