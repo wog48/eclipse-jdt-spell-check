@@ -11,7 +11,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -40,19 +39,28 @@ public class MarkerFactory {
     }
   }
 
+  public synchronized void prepare(final IResource resource) {
+    final MarkerJob job = new MarkerJob(resource, () -> {
+      clear(resource);
+    });
+    job.schedule();
+  }
+
   private boolean makerChanged(final List<SpellingEvent> toBeMarked) {
     final Set<SpellingEvent> found = new HashSet<>();
-    for (final SpellingEvent m : toBeMarked)
-      if (!marker.contains(m))
-        return true;
-      else
-        found.add(m);
-    return found.size() != marker.size();
+    if (marker.size() == toBeMarked.size()) {
+      for (final SpellingEvent m : toBeMarked)
+        if (!marker.contains(m))
+          return true;
+        else
+          found.add(m);
+      return found.size() != marker.size();
+    }
+    return true;
   }
 
   public void create(final SpellingEvent event) {
     try {
-      final IJavaElement javaElement = event.getElement();
       final IResource resource = findResource(event);
       final ISourceRange sourceRange = event.getSourceRange();
 

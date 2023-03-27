@@ -101,6 +101,7 @@ class PartListener implements IPartListener {
 
   private void checkResource(final IResource resource) {
     if (shouldProcess(resource)) {
+      markerFactory.prepare(resource);
       final List<SpellingEvent> spellEvents = spellChecker.checkResource(resource);
       markerFactory.process(resource, spellEvents);
     }
