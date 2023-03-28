@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -23,10 +24,17 @@ class SpellCheckVisitor extends ASTVisitor {
   private final ISpellChecker checker;
   private final List<SpellingEvent> spellEvents;
   private IResource methodResource;
+  private CompilationUnit compilationUnit;
 
   public SpellCheckVisitor(final ISpellChecker checker) {
     this.checker = checker;
     this.spellEvents = new ArrayList<>();
+  }
+
+  @Override
+  public boolean visit(final CompilationUnit node) {
+    this.compilationUnit = node;
+    return super.visit(node);
   }
 
   @Override
@@ -86,20 +94,23 @@ class SpellCheckVisitor extends ASTVisitor {
   }
 
   private void checkNode(final TypeDeclaration node) {
-    triggerSpellCheck(node.resolveBinding());
+    final int lineNumber = compilationUnit.getLineNumber(node.getStartPosition()) - 1;
+    triggerSpellCheck(node.resolveBinding(), lineNumber);
   }
 
   private void checkNode(final MethodDeclaration node) {
-    final IJavaElement element = triggerSpellCheck(node.resolveBinding());
+    final int lineNumber = compilationUnit.getLineNumber(node.getStartPosition()) - 1;
+    final IJavaElement element = triggerSpellCheck(node.resolveBinding(), lineNumber);
     if (element != null)
       this.methodResource = element.getResource();
   }
 
   private void checkNode(final VariableDeclaration declaration) {
-    triggerSpellCheck(declaration.resolveBinding());
+    final int lineNumber = compilationUnit.getLineNumber(declaration.getStartPosition()) - 1;
+    triggerSpellCheck(declaration.resolveBinding(), lineNumber);
   }
 
-  private IJavaElement triggerSpellCheck(final IBinding binding) {
+  private IJavaElement triggerSpellCheck(final IBinding binding, final int lineNumber) {
     if (binding != null) {
       final IJavaElement element = binding.getJavaElement();
       final List<SpellingEvent> events = checker.checkElement(element);

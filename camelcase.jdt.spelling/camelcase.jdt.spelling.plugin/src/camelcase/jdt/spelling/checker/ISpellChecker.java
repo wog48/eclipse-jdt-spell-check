@@ -10,8 +10,6 @@ import camelcase.jdt.spelling.parser.Token;
 
 public interface ISpellChecker {
 
-  void complete(IResource resource);
-
   List<SpellingEvent> checkElement(ICompilationUnit create);
 
   List<SpellingEvent> checkElement(Token token);
@@ -22,6 +20,6 @@ public interface ISpellChecker {
 
   void respectSingleCharacter();
 
-  List<SpellingEvent> checkResource(IResource r);
+  List<SpellingEvent> checkResource(IResource resource);
 
 }

@@ -48,15 +48,12 @@ public class MarkerFactory {
 
   private boolean makerChanged(final List<SpellingEvent> toBeMarked) {
     final Set<SpellingEvent> found = new HashSet<>();
-    if (marker.size() == toBeMarked.size()) {
-      for (final SpellingEvent m : toBeMarked)
-        if (!marker.contains(m))
-          return true;
-        else
-          found.add(m);
-      return found.size() != marker.size();
-    }
-    return true;
+    for (final SpellingEvent m : toBeMarked)
+      if (!marker.contains(m))
+        return true;
+      else
+        found.add(m);
+    return found.size() != marker.size();
   }
 
   public void create(final SpellingEvent event) {
@@ -64,8 +61,8 @@ public class MarkerFactory {
       final IResource resource = findResource(event);
       final ISourceRange sourceRange = event.getSourceRange();
 
-      scheduleWorkspaceJob(resource, sourceRange.getOffset(),
-          sourceRange.getOffset() + sourceRange.getLength(), event.getFragment().getOriginalFragment());
+      scheduleWorkspaceJob(resource, sourceRange.getOffset(), sourceRange.getOffset() + sourceRange.getLength(), event
+          .getFragment().getOriginalFragment());
 
     } catch (final CoreException e) {
       SpellingPlugin.getInstance().getLog().error("", e);
@@ -78,9 +75,6 @@ public class MarkerFactory {
     final IResource r = event.getElement().getResource();
     if (r == null)
       return event.getResource();
-//    final IResource r = event.getResource();
-//    if (r == null && event.getParent() != null)
-//      return findResource(event.getParent());
     return r;
   }
 

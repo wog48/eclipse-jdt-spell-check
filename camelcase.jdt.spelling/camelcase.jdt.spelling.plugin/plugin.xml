@@ -38,7 +38,7 @@
             includeOnPreferencePage="true"
             label="%specification.label"
             overviewRulerPreferenceKey="camelcase.jdt.spelling.marker.overview"
-            overviewRulerPreferenceValue="false"
+            overviewRulerPreferenceValue="true"
             presentationLayer="0"
             quickFixIcon="icons/spellcheck.gif"
             showInNextPrevDropdownToolbarAction="true"

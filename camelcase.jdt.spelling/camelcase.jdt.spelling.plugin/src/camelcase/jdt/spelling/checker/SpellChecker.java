@@ -38,11 +38,6 @@ class SpellChecker implements ISpellChecker {
   }
 
   @Override
-  public void complete(final IResource resource) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public List<SpellingEvent> checkElement(final Token token) {
     List<Fragment> unknownFragments = token.getFragments();
 
