@@ -14,7 +14,7 @@ Two options to correct
 
 Preferences
 
-image::camelcase.jdt.spelling/images/QuickFixProposals.png[]
+image::images/QuickFixProposals.png[]
 
 The check respects 
 
