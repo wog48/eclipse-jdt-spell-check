@@ -14,7 +14,7 @@ Two options to correct
 
 Preferences
 
-image::camelcase.jdt.spelling/images/QuickFixNoProposal.png[]
+image::camelcase.jdt.spelling/images/QuickFixProposals.png[]
 
 The check respects 
 
@@ -25,7 +25,7 @@ Not all occurrences are marked
 
 [NOTE]
 ====
-An admonition block may contain complex content.
+Spell errors of local variable definitions within lambda expression my raise an error when trying to rename the local variable.
 
 ====
 
