@@ -7,9 +7,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
@@ -76,8 +79,6 @@ class SpellCheckVisitor extends ASTVisitor {
 
   @Override
   public boolean visit(final VariableDeclarationFragment node) {
-    node.getLocationInParent();
-    node.getStartPosition();
     checkNode(node);
     return false;
   }
@@ -87,6 +88,21 @@ class SpellCheckVisitor extends ASTVisitor {
     for (final Object parameter : node.parameters())
       checkNode((VariableDeclarationFragment) parameter);
     return false;
+  }
+
+  @Override
+  public boolean visit(final EnumConstantDeclaration node) {
+    final IVariableBinding binding = node.resolveVariable();
+    final int lineNumber = compilationUnit.getLineNumber(node.getStartPosition()) - 1;
+    triggerSpellCheck(binding, lineNumber);
+    return false;
+  }
+
+  @Override
+  public boolean visit(final EnumDeclaration node) {
+    final int lineNumber = compilationUnit.getLineNumber(node.getStartPosition()) - 1;
+    triggerSpellCheck(node.resolveBinding(), lineNumber);
+    return true;
   }
 
   public List<SpellingEvent> getSpellEvents() {
@@ -111,10 +127,10 @@ class SpellCheckVisitor extends ASTVisitor {
   }
 
   private IJavaElement triggerSpellCheck(final IBinding binding, final int lineNumber) {
-    if (binding != null) {
+    if (binding != null && binding.getJavaElement() != null) {
       final IJavaElement element = binding.getJavaElement();
       final List<SpellingEvent> events = checker.checkElement(element);
-      events.stream().forEach(e -> e.setResource(methodResource));
+      events.stream().forEach(event -> event.setResource(methodResource));
       spellEvents.addAll(events);
       return element;
     }
