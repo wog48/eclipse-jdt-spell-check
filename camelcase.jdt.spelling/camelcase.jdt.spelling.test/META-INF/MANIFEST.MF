@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Test
 Bundle-SymbolicName: camelcase.jdt.spelling.test;singleton:=true
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.3
 Bundle-Vendor: wog48
-Fragment-Host: camelcase.jdt.spelling.plugin;bundle-version="1.0.2"
+Fragment-Host: camelcase.jdt.spelling.plugin;bundle-version="1.0.3"
 Automatic-Module-Name: camelcase.jdt.spelling.test
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: junit-jupiter-api;bundle-version="5.9.1",
  junit-jupiter-engine;bundle-version="5.9.1",
  junit-jupiter-params;bundle-version="5.9.1",

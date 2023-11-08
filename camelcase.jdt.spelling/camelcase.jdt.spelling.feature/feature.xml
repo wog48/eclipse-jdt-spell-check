@@ -2,7 +2,7 @@
 <feature
       id="camelcase.jdt.spelling.feature"
       label="Java Spell Checker"
-      version="1.0.2"
+      version="1.0.3"
       provider-name="wog48">
 
    <description url="https://github.com/wog48/eclipse-jdt-spell-check/blob/main/README.md">
@@ -297,7 +297,7 @@ version(s), and exceptions or additional permissions here}.&quot;
          id="camelcase.jdt.spelling.plugin"
          download-size="0"
          install-size="0"
-         version="1.0.2"
+         version="1.0.3"
          unpack="false"/>
 
 </feature>
