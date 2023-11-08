@@ -42,18 +42,20 @@ public class SpellingFixProcessor implements IQuickFixProcessor {
         && context.getCoveringNode() instanceof SimpleName) {
 
       final SimpleName term = (SimpleName) context.getCoveringNode();
-      final Token token = new Token(term.resolveBinding().getJavaElement());
-      final int position = context.getSelectionOffset() - term.getStartPosition();
-      final ISpellChecker checker = SpellingPlugin.getInstance().getSpellChecker();
-      final List<IDirectory> directories = SpellingPlugin.getInstance().getDictionaryFactory().getDirectories();
+      if (term.resolveBinding() != null) {
+        final Token token = new Token(term.resolveBinding().getJavaElement());
+        final int position = context.getSelectionOffset() - term.getStartPosition();
+        final ISpellChecker checker = SpellingPlugin.getInstance().getSpellChecker();
+        final List<IDirectory> directories = SpellingPlugin.getInstance().getDictionaryFactory().getDirectories();
 
-      if (checker != null && directories != null) {
-        final List<SpellingEvent> spellEvents = determineSpellEvents(token, position, checker);
-        final Map<Fragment, List<String>> r = buildReplacements(directories, spellEvents);
-        final List<Map<Fragment, String>> preProposals = buildPreProposal(r);
-        final List<IJavaCompletionProposal> proposals = asProposal(context, term, token, preProposals);
-        createAddWordProposal(position, spellEvents).ifPresent(proposals::add);
-        return proposals.toArray(new IJavaCompletionProposal[proposals.size()]);
+        if (checker != null && directories != null) {
+          final List<SpellingEvent> spellEvents = determineSpellEvents(token, position, checker);
+          final Map<Fragment, List<String>> r = buildReplacements(directories, spellEvents);
+          final List<Map<Fragment, String>> preProposals = buildPreProposal(r);
+          final List<IJavaCompletionProposal> proposals = asProposal(context, term, token, preProposals);
+          createAddWordProposal(position, spellEvents).ifPresent(proposals::add);
+          return proposals.toArray(new IJavaCompletionProposal[proposals.size()]);
+        }
       }
     }
     return null;
@@ -117,13 +119,13 @@ public class SpellingFixProcessor implements IQuickFixProcessor {
     return replacements;
   }
 
-  private List<SpellingEvent> determineSpellEvents(final Token token, final int pos,
+  private List<SpellingEvent> determineSpellEvents(final Token token, final int position,
       final ISpellChecker checker) {
 
     final List<SpellingEvent> events = checker.checkElement(token);
 
     final Optional<SpellingEvent> spellEvent = events.stream()
-        .filter(e -> selected(e.getFragment(), pos))
+        .filter(e -> selected(e.getFragment(), position))
         .findFirst();
 
     if (events.size() > MAX_ERRORS_AT_ONCE && spellEvent.isPresent())
