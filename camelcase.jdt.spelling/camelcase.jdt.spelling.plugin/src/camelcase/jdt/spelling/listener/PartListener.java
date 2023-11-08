@@ -71,8 +71,8 @@ class PartListener implements IPartListener {
 
   private void clearEditor(final IEditorPart editor) {
     final IResource resource = getResource(editor);
-    if (shouldProcess(resource) && spellChecker != null)
-      spellChecker.complete(resource);
+    if (shouldProcess(resource) && markerFactory != null)
+      markerFactory.prepare(resource);
   }
 
   private IResource getResource(final IEditorPart editor) {
@@ -101,6 +101,7 @@ class PartListener implements IPartListener {
 
   private void checkResource(final IResource resource) {
     if (shouldProcess(resource)) {
+      markerFactory.prepare(resource);
       final List<SpellingEvent> spellEvents = spellChecker.checkResource(resource);
       markerFactory.process(resource, spellEvents);
     }

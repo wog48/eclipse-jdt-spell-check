@@ -18,15 +18,22 @@ public class Token {
 
   private final List<Fragment> fragments;
   private final IJavaElement element;
+  private final int lineNumber;
 
   public Token(final IJavaElement element) {
-    this.element = element;
-    this.fragments = element == null ? Collections.emptyList() : tokanize(element.getElementName());
+    this(element, 0);
   }
 
   private Token(final IJavaElement element, final List<Fragment> fragments) {
     this.element = element;
     this.fragments = fragments;
+    this.lineNumber = 0;
+  }
+
+  public Token(final IJavaElement element, final int lineNumber) {
+    this.element = element;
+    this.fragments = element == null ? Collections.emptyList() : tokanize(element.getElementName());
+    this.lineNumber = lineNumber;
   }
 
   public List<Fragment> getFragments() {
@@ -35,6 +42,10 @@ public class Token {
 
   public IJavaElement getElement() {
     return element;
+  }
+
+  public int getLineNumber() {
+    return lineNumber;
   }
 
   private List<Fragment> tokanize(final String name) {

@@ -24,7 +24,7 @@ public class AddWordProposal implements IJavaCompletionProposal {
   @Override
   public void apply(final IDocument document) {
     factory.addToUserDirectory(original);
-
+    SpellingPlugin.getInstance().checkCurrent();
   }
 
   @Override

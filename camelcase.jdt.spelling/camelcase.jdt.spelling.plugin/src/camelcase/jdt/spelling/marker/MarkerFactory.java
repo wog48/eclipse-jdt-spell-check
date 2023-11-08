@@ -11,7 +11,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -40,6 +39,13 @@ public class MarkerFactory {
     }
   }
 
+  public synchronized void prepare(final IResource resource) {
+    final MarkerJob job = new MarkerJob(resource, () -> {
+      clear(resource);
+    });
+    job.schedule();
+  }
+
   private boolean makerChanged(final List<SpellingEvent> toBeMarked) {
     final Set<SpellingEvent> found = new HashSet<>();
     for (final SpellingEvent m : toBeMarked)
@@ -52,18 +58,24 @@ public class MarkerFactory {
 
   public void create(final SpellingEvent event) {
     try {
-      final IJavaElement javaElement = event.getElement();
-      final IResource resource = javaElement.getResource();
+      final IResource resource = findResource(event);
       final ISourceRange sourceRange = event.getSourceRange();
 
-      scheduleWorkspaceJob(resource, sourceRange.getOffset(),
-          sourceRange.getOffset() + sourceRange.getLength(), event.getFragment().getOriginalFragment());
+      scheduleWorkspaceJob(resource, sourceRange.getOffset(), sourceRange.getOffset() + sourceRange.getLength(), event
+          .getFragment().getOriginalFragment());
 
     } catch (final CoreException e) {
       SpellingPlugin.getInstance().getLog().error("", e);
     } finally {
       marker.add(event);
     }
+  }
+
+  private IResource findResource(final SpellingEvent event) {
+    final IResource r = event.getElement().getResource();
+    if (r == null)
+      return event.getResource();
+    return r;
   }
 
   private void scheduleWorkspaceJob(final IResource resource, final int start, final int end,
@@ -80,6 +92,8 @@ public class MarkerFactory {
 
   private Optional<IMarker> create(final IResource resource, final Map<String, Object> attributes) {
     try {
+      if (resource == null)
+        SpellingPlugin.getInstance().getLog().error("Resource null");
       if (resource.exists())
         return Optional.of(resource.createMarker(SPELLING_MARKER, attributes));
     } catch (final CoreException e) {
